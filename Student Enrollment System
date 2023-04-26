@@ -1,0 +1,246 @@
+
+Project Title: Stu enrollment system
+#include<stdio.h>
+#include<conio.h>
+#include<string.h>
+#include<stdlib.h>
+struct stu
+{
+int id;
+char name[20];
+}
+s;
+FILE *fp, *t;
+int idno,op,found;
+char ch, sname[20];
+void newstu(); /* fun dec */
+void enquiry();
+void report();
+void upd();
+void del();
+void line(); /* fun dec */
+void line() /* fun def */
+{
+
+puts("------------------------------------------------------------------");
+}
+void main()
+{
+clrscr();
+line();
+puts("\t\t\t STUDENT ENROLLMENT SYSTEM");
+line();
+puts("\t\t\t 1. New student");
+puts("\t\t\t 2. Enquiry");
+puts("\t\t\t\t a. Id Wise Enquiry");
+puts("\t\t\t\t b. Name Wise Enquiry");
+puts("\t\t\t 3. Report");
+puts("\t\t\t 4. Update/Edit");
+puts("\t\t\t 5. Delete");
+puts("\t\t\t 6. Exit");
+line();
+printf("\t\t\t Enter Ur Option[ ]\b\b");
+scanf("%d",&op);
+switch(op)
+{
+case 1:
+
+newstu();
+break;
+case 2:
+enquiry();
+break;
+case 3:
+report();
+break;
+case 4:
+upd();
+break;
+case 5:
+del();
+break;
+case 6: exit(0);
+default: puts("Invalid option");
+}
+getch();
+main(); /* rec */
+}
+void newstu()
+{
+
+clrscr();
+fp = fopen("11amstu.dat","a");
+do
+{
+printf("Enter stu id ");
+scanf("%d",&s.id);
+flushall();
+printf("Enter stu name ");
+gets(s.name);
+fwrite(&s,sizeof(s),1,fp);
+puts("1 row created");
+flushall();
+printf("Next stu [y/n] ");
+scanf("%c",&ch);
+}
+while(ch=='y'||ch=='Y');
+fclose(fp);
+}
+
+void enquiry()
+{
+clrscr();
+
+found=0;
+puts("a. Id Wise Enquiry");
+puts("b. Name Wise Enquiry");
+line();
+flushall();
+printf("Enter your choice ");
+scanf("%c",&ch);
+if(ch=='a'||ch=='A')
+{
+printf("Enter stu id to search ");
+scanf("%d",&idno);
+fp = fopen("11amstu.dat","r");
+fread(&s,sizeof(s),1,fp);
+while(!feof(fp))
+{
+if(idno==s.id)
+{
+found=1;
+puts("Id\tName");
+line();
+printf("%d\t%s\n",s.id,s.name);
+break;
+
+}
+fread(&s,sizeof(s),1,fp);
+}
+}
+else if(ch=='b'||ch=='B')
+{
+flushall();
+printf("Enter stu name to search ");
+gets(sname);
+fp = fopen("11amstu.dat","r");
+fread(&s,sizeof(s),1,fp);
+while(!feof(fp))
+{
+if(stricmp(sname,s.name)==0)
+{
+found=1;
+puts("Id\tName");
+line();
+printf("%d\t%s\n",s.id,s.name);
+break;
+}
+fread(&s,sizeof(s),1,fp);
+
+}
+}
+else
+{
+puts("Invalid selection");
+getch();
+enquiry();
+}
+if(found==0)
+printf("stu not found");
+fclose(fp);
+}
+
+void report()
+{
+int cnt=0;
+clrscr();
+fp = fopen("11amstu.dat","r");
+fread(&s,sizeof(s),1,fp);
+puts("Id\tName");
+line();
+while(!feof(fp))
+
+{
+cnt++;
+printf("%d\t%s\n",s.id,s.name);
+fread(&s,sizeof(s),1,fp);
+}
+fclose(fp);
+line();
+printf("%d row(s) selected",cnt);
+}
+
+void upd()
+{
+clrscr();
+found=0;
+fp=fopen("11amstu.dat","r+");
+printf("Enter stu id to update ");
+scanf("%d",&idno);
+fread(&s,sizeof(s),1,fp);
+while(!feof(fp))
+{
+if(idno==s.id)
+{
+
+puts("Id\tName");
+line();
+printf("%d\t%s\n",s.id,s.name);
+found=1;
+printf("Enter new id ");
+scanf("%d",&s.id);
+flushall();
+printf("Enter new name ");
+gets(s.name);
+fseek( fp, ftell(fp)-sizeof(s),0); /* 0 - cur pos */
+fwrite(&s,sizeof(s),1,fp);
+puts("1 row(s) updated");
+break;
+}
+fread(&s,sizeof(s),1,fp);
+}
+fclose(fp);
+if(found==0)puts("Stu not found");
+}
+
+void del()
+{
+
+clrscr();
+found=0;
+fp=fopen("11amstu.dat","r");
+t =fopen("temp","w");
+printf("Enter stu id to delete ");
+scanf("%d",&idno);
+fread(&s,sizeof(s),1,fp);
+while(!feof(fp))
+{
+if(idno==s.id)
+{
+found=1;
+puts("Id\tName");
+line();
+printf("%d\t%s\n",s.id,s.name);
+}
+else fwrite(&s,sizeof(s),1,t);
+fread(&s,sizeof(s),1,fp);
+}
+fclose(fp);
+fclose(t);
+if(found==0)
+
+puts("Stu not found");
+else
+{
+printf("R u sure to delete record ");
+flushall();
+scanf("%c",&ch);
+if(ch=='y'||ch=='Y')
+{
+remove("11amstu.dat");
+rename("temp","11amstu.dat");
+puts("1 row(s) deleted");
+}
+else puts("Operation cancelled by the user");
+}
+}
